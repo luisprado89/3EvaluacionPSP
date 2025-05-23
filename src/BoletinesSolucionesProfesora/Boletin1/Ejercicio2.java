@@ -15,24 +15,30 @@ import java.net.URL;
 
 public class Ejercicio2 {
     public static void main(String[] args) {
-        URL url = null;
+        URL url = null; // Variable para almacenar el objeto URL
+
         try {
-            url = new URL("https://www.edu.xunta.gal");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            url = new URL("https://www.edu.xunta.gal"); // Se crea un objeto URL con una dirección web
+        } catch (MalformedURLException e) { // Captura si la URL está mal escrita
+            e.printStackTrace(); // Imprime el error detallado
         }
 
-        BufferedReader in;
+        BufferedReader in; // Declaración del lector que se usará para leer el HTML de la página
+
         try {
-            InputStream inputStream = url.openStream();
-            in = new BufferedReader(new InputStreamReader(inputStream));
-            String inputLine;
+            InputStream inputStream = url.openStream(); // Abre un flujo de entrada desde la URL
+            in = new BufferedReader(new InputStreamReader(inputStream)); // Convierte el flujo de bytes a caracteres y lo envuelve en un buffer
+
+            String inputLine; // Variable para almacenar cada línea leída
+
+            // Mientras se puedan leer líneas de la página...
             while ((inputLine = in.readLine()) != null)
-                System.out.println(inputLine);
-            in.close();
+                System.out.println(inputLine); // Se imprime cada línea del código HTML en consola
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            in.close(); // Se cierra el lector para liberar recursos
+
+        } catch (IOException e) { // Captura cualquier error al abrir o leer la URL
+            e.printStackTrace(); // Imprime el error
         }
-    }//
-}//Ejemplo2URL
+    } // Fin del método main
+} // Fin de la clase Ejercicio2

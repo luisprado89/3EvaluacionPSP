@@ -23,16 +23,16 @@ package BoletinesSolucionesProfesora.Boletin2.Ejercicio3;
 * o si estando el servidor ejecutándose ocurre algún error en el cliente, o este finaliza
 * inesperadamente, etc.
  */
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
+import java.io.ByteArrayInputStream; // Para convertir byte[] a objeto
+import java.io.ByteArrayOutputStream; // Para convertir objeto a byte[]
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream; // Para leer un objeto de un byte[]
+import java.io.ObjectOutputStream; // Para escribir un objeto a un byte[]
 import java.net.ConnectException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.DatagramPacket; // Paquetes UDP
+import java.net.DatagramSocket; // Socket UDP
+import java.net.InetAddress; // IP destino
 import java.net.UnknownHostException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -40,77 +40,72 @@ import java.util.Scanner;
 public class Cliente_UDP {
 
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
-		
-		int Puerto = 6000;// puerto remoto
-		InetAddress IPServidor = InetAddress.getLocalHost();// localhost
-		Scanner sc = new Scanner(System.in);		
-		
+
+		int Puerto = 6000; // Puerto del servidor
+		InetAddress IPServidor = InetAddress.getLocalHost(); // IP del servidor (localhost)
+
+		Scanner sc = new Scanner(System.in); // Scanner para leer desde teclado
 		DatagramSocket cliente = null;
+
 		try {
-			cliente = new DatagramSocket();
+			cliente = new DatagramSocket(); // Crea el socket UDP
 			System.out.println("PROGRAMA CLIENTE INICIADO....");
 		} catch (ConnectException ce) {
-			System.out.println("ERROR AL ESTABLECER LA CONEXI�N CON EL SERVIDOR....");
+			System.out.println("ERROR AL ESTABLECER LA CONEXIÓN CON EL SERVIDOR....");
 			System.exit(0);
 		}
-		
-		
-    	int numero = 0;
 
-		do {			
+		int numero = 0;
+
+		do {
 			System.out.print("Introduce un numero: ");
-
 			try {
-				numero = sc.nextInt();
-				sc.nextLine();
+				numero = sc.nextInt(); // Lee el número desde teclado
+				sc.nextLine(); // Limpia el buffer
 			} catch (InputMismatchException nn) {
-				sc.nextLine();
-				numero = 1;
-				System.out.print("\tN�mero incorrecto...\n");
+				sc.nextLine(); // Descarta entrada inválida
+				numero = 1; // Valor válido para seguir
+				System.out.print("\tNúmero incorrecto...\n");
 				continue;
 			}
-			
+
+			// Crea el objeto y establece el número
 			Numeros n = new Numeros();
 			n.setNumero(numero);
 
-			//CONVERTIMOS OBJETO A BYTES
-			ByteArrayOutputStream bs= new ByteArrayOutputStream();
-			ObjectOutputStream out = new ObjectOutputStream (bs);
-			
-			out.reset();
-			out.writeObject(n); //escribir objeto 
-			byte[] enviados =  bs.toByteArray(); // objeto en bytes
-			
-			//envir objeto
+			// CONVERTIR OBJETO A BYTE[]
+			ByteArrayOutputStream bs = new ByteArrayOutputStream();
+			ObjectOutputStream out = new ObjectOutputStream(bs);
+			out.reset(); // Limpia posibles referencias internas
+			out.writeObject(n); // Serializa el objeto
+			byte[] enviados = bs.toByteArray(); // Convierte a byte[]
+
+			// Enviar datagrama UDP al servidor
 			DatagramPacket envio = new DatagramPacket(enviados, enviados.length, IPServidor, Puerto);
 			cliente.send(envio);
-			
-			// Se recibe un objeto
-			if (numero > 0) {				
-				byte[] recibidos = new byte[1024];
-				DatagramPacket paqRecibido = new 
-				               DatagramPacket(recibidos, recibidos.length);
-				cliente.receive(paqRecibido); //recibo el datagrama
 
-				// CONVERTIMOS BYTES A OBJETO
-				ByteArrayInputStream bais = new ByteArrayInputStream(recibidos); 
+			// Si el número es mayor a 0, esperar la respuesta
+			if (numero > 0) {
+				byte[] recibidos = new byte[1024]; // Buffer de entrada
+				DatagramPacket paqRecibido = new DatagramPacket(recibidos, recibidos.length);
+				cliente.receive(paqRecibido); // Recibe el datagrama
+
+				// CONVERTIR BYTE[] A OBJETO
+				ByteArrayInputStream bais = new ByteArrayInputStream(recibidos);
 				ObjectInputStream in = new ObjectInputStream(bais);
-				
-				Numeros dato  = new Numeros();
-				dato = (Numeros) in.readObject();//obtengo objeto
-                in.close();
-                
+
+				Numeros dato = (Numeros) in.readObject(); // Reconstruye el objeto recibido
+				in.close();
+
+				// Mostrar resultados
 				System.out.println("\tCuadrado : " + dato.getCuadrado() + ", Cubo: * " + dato.getCubo());
 			}
 
-		} while (numero > 0);
+		} while (numero > 0); // Repetir mientras el número sea mayor que 0
 
 		System.out.println("CLIENTE UDP FINALIZADO....");
 
-		// CERRAR STREAMS Y SOCKETS
-		
+		// CERRAR SOCKET
 		cliente.close();
-
 	}
-
 }

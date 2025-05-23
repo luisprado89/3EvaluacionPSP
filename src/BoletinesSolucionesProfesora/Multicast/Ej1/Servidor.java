@@ -19,32 +19,42 @@ import java.net.MulticastSocket;
 
 public class Servidor {
     public static void main(String[] args) {
-        // FLUJO PARA ENTRADA ESTANDAR
+
+        // FLUJO PARA LEER DATOS DESDE TECLADO
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-        //Se crea el socket multicast.
         MulticastSocket ms = null;
-        try {
-            ms = new MulticastSocket();
 
-            int Puerto = 12345;//Puerto multicast
-            InetAddress grupo = InetAddress.getByName("225.0.0.1");//Grupo
+        try {
+            // 1. CREACIÓN DEL SOCKET MULTICAST (solo para enviar en este caso)
+            ms = new MulticastSocket(); // No se especifica puerto porque solo se enviará
+
+            int Puerto = 12345; // Puerto multicast al que deben suscribirse los clientes
+            InetAddress grupo = InetAddress.getByName("225.0.0.1"); // Dirección del grupo multicast (clase D)
 
             String cadena = "";
 
-            while (!cadena.trim().equals("*")) {
+            // 2. BUCLE PRINCIPAL: LEER Y ENVIAR MENSAJES
+            while (!cadena.trim().equals("*")) { // Termina si el usuario escribe '*'
                 System.out.print("Datos a enviar al grupo: ");
-                cadena = in.readLine();
-                // ENVIANDO AL GRUPO
-                DatagramPacket paquete = new DatagramPacket(cadena.getBytes(), cadena.length(), grupo, Puerto);
-                ms.send(paquete);
+                cadena = in.readLine(); // Lee el mensaje desde teclado
+
+                // 3. CONSTRUIR Y ENVIAR PAQUETE MULTICAST
+                DatagramPacket paquete = new DatagramPacket(
+                        cadena.getBytes(),        // Contenido del mensaje
+                        cadena.length(),          // Longitud del mensaje
+                        grupo,                    // Dirección IP del grupo
+                        Puerto                    // Puerto del grupo
+                );
+                ms.send(paquete); // Envía el paquete al grupo multicast
             }
-            ms.close();//cierro socket
+
+            // 4. CERRAR SOCKET CUANDO SE TERMINA
+            ms.close();
             System.out.println("Socket cerrado...");
 
-        } catch (
-                IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e); // Manejo simple de excepciones
         }
     }
 }

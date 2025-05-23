@@ -1,34 +1,38 @@
-package BoletinesSolucionesProfesora.Boletin2.Ejercicio1;
+package BoletinesSolucionesProfesora.Boletin2.Ejercicio1; // Paquete del ejercicio
 
+import java.io.IOException; // Para capturar errores de E/S
+import java.net.ServerSocket; // Para crear el socket servidor
+import java.net.Socket; // Para aceptar conexiones cliente
 
-import java.io.IOException;
+public class ServidorTCP { // Clase principal del servidor
 
-import java.net.ServerSocket;
-import java.net.Socket;
-
-
-public class ServidorTCP {
-
-	static Profesor arrayObjetosProfesor[] = new Profesor[5];
+	static Profesor arrayObjetosProfesor[] = new Profesor[5]; // Array con 5 objetos Profesor
 
 	public static void main(String[] args) throws IOException {
-		int idcliente=0;
-		llenarArrays();
-		ServerSocket servidor;
-		servidor = new ServerSocket(6000);
+		int idcliente = 0; // Contador para asignar IDs únicos a cada cliente
+
+		llenarArrays(); // Llama al método que inicializa los datos de los profesores
+
+		ServerSocket servidor; // Objeto para escuchar conexiones entrantes
+		servidor = new ServerSocket(6000); // Abre el servidor en el puerto 6000
 		System.out.println("Servidor iniciado...");
-		while (true) {			
-			Socket cliente;
-			cliente = servidor.accept();// esperando cliente
-			idcliente++;
-			System.out.println("Cliente "+ idcliente + " conectado");
+
+		while (true) { // Bucle infinito para aceptar múltiples clientes
+			Socket cliente; // Socket para la conexión con un cliente
+			cliente = servidor.accept(); // Espera una conexión cliente (bloqueante)
+			idcliente++; // Incrementa el número de cliente
+
+			System.out.println("Cliente " + idcliente + " conectado");
+
+			// Crea un nuevo hilo para atender al cliente y lo arranca
 			HiloServidor hilo = new HiloServidor(cliente, arrayObjetosProfesor, idcliente);
-			hilo.start();
+			hilo.start(); // Inicia el hilo
 		}
+	}
 
-	}// main
-
+	// Método que inicializa el array de profesores con datos de ejemplo
 	private static void llenarArrays() {
+		// Creación de asignaturas
 		Asignatura asi1 = new Asignatura(1, "Matematicas I");
 		Asignatura asi11 = new Asignatura(11, "Matematicas II");
 		Asignatura asi12 = new Asignatura(12, "Matematicas III");
@@ -46,9 +50,12 @@ public class ServidorTCP {
 		Asignatura asi22 = new Asignatura(22, "Ingles");
 		Asignatura asi23 = new Asignatura(23, "Frances");
 
+		// Creación de especialidades
 		Especialidad espe1 = new Especialidad(1, "INFORMATICA");
 		Especialidad espe2 = new Especialidad(2, "MATEMATICAS");
 		Especialidad espe3 = new Especialidad(3, "LENGUA");
+
+		// Profesores con sus asignaturas y especialidades
 
 		Asignatura[] asignaturas1 = new Asignatura[3];
 		asignaturas1[0] = asi1;
@@ -57,13 +64,11 @@ public class ServidorTCP {
 		Profesor profesor2 = new Profesor(2, "Luis", asignaturas1, espe2);
 		Profesor profesor5 = new Profesor(5, "Jesus", asignaturas1, espe2);
 
-		// Asignatura [] asignaturas = new Asignatura [3] ;
 		Asignatura[] asignaturas2 = new Asignatura[3];
 		asignaturas2[0] = asi2;
 		asignaturas2[1] = asi3;
 		asignaturas2[2] = asi4;
-
-		Profesor profesor1 = new Profesor(1, "Mar�a Jes�s", asignaturas2, espe1);
+		Profesor profesor1 = new Profesor(1, "María Jesús", asignaturas2, espe1);
 
 		Asignatura[] asignaturas3 = new Asignatura[3];
 		asignaturas3[0] = asi6;
@@ -77,12 +82,11 @@ public class ServidorTCP {
 		asignaturas4[2] = asi23;
 		Profesor profesor3 = new Profesor(3, "Maria", asignaturas4, espe3);
 
+		// Almacena los profesores en el array global
 		arrayObjetosProfesor[0] = profesor1;
 		arrayObjetosProfesor[1] = profesor2;
 		arrayObjetosProfesor[2] = profesor3;
 		arrayObjetosProfesor[3] = profesor4;
 		arrayObjetosProfesor[4] = profesor5;
-
 	}
-
 }

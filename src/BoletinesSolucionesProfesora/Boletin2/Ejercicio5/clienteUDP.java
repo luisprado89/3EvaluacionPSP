@@ -23,68 +23,68 @@ package BoletinesSolucionesProfesora.Boletin2.Ejercicio5;
  * Si el idAlumno no se encuentra registrado, el servidor le devolverá un objeto Alumno con datos
  * vacíos.
  */
+
 import java.io.*;
 import java.net.*;
 
 public class clienteUDP {
+
 	public static void main(String args[]) throws Exception {
-		// SOCKET cliente
-		DatagramSocket clientSocket = new DatagramSocket();
-		
-		// FLUJO PARA ENTRADA ESTANDAR
+
+		DatagramSocket clientSocket = new DatagramSocket(); // Socket UDP para el cliente
+
+		// Entrada desde teclado
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-		// DATOS DEL SERVIDOR
-		InetAddress IPServidor = InetAddress.getLocalHost();// localhost
-		int puerto = 9876; // puerto por el que escucha
+		// Dirección y puerto del servidor
+		InetAddress IPServidor = InetAddress.getLocalHost(); // IP del servidor (localhost)
+		int puerto = 9876; // Puerto UDP del servidor
 
 		while (true) {
 			System.out.print("Introduce identificador a consultar: ");
-			String cadena = in.readLine();
-			
-			/*Integer identificador = 0;
-			
-			try {
-				identificador = Integer.parseInt(cadena);
-			} catch (NumberFormatException nex) {
-				continue;
-			}*/
-			
-			if(cadena.trim().equals("*")) break;
-			// convertimos objeto a bytes
+			String cadena = in.readLine(); // Lee ID alumno o '*'
+
+			if (cadena.trim().equals("*")) break; // Si es '*', termina
+
+			// SERIALIZACIÓN: convertir el String (ID alumno) a bytes
 			ByteArrayOutputStream bs = new ByteArrayOutputStream();
 			ObjectOutputStream os = new ObjectOutputStream(bs);
-			os.writeObject(cadena); // 
+			os.writeObject(cadena); // Envía el identificador como objeto
 			os.close();
-			
-			// ENVIANDO AL SERVIDOR
-			byte[] enviados = bs.toByteArray();			
+			byte[] enviados = bs.toByteArray(); // bytes listos para enviar
+
+			// ENVÍA EL DATAGRAMA AL SERVIDOR
 			DatagramPacket envio = new DatagramPacket(enviados, enviados.length, IPServidor, puerto);
 			clientSocket.send(envio);
 
-			// RECIBIENDO DEL SERVIDOR
+			// PREPARA PARA RECIBIR RESPUESTA DEL SERVIDOR
 			byte[] recibidos = new byte[1024];
 			DatagramPacket recibo = new DatagramPacket(recibidos, recibidos.length);
-			
+
 			try {
-				// TIEMPO DE ESPERA
-				clientSocket.setSoTimeout(5000);
-				clientSocket.receive(recibo);
-				// CONVERTIMOS bytes a objeto
+				clientSocket.setSoTimeout(5000); // Espera máxima: 5 segundos
+				clientSocket.receive(recibo); // Espera la respuesta
+
+				// DESERIALIZACIÓN: convertir byte[] recibido en objeto Alumno
 				ByteArrayInputStream bais = new ByteArrayInputStream(recibidos);
 				ObjectInputStream is = new ObjectInputStream(bais);
-				Alumno alumno = (Alumno) is.readObject();
+				Alumno alumno = (Alumno) is.readObject(); // Reconstruye el objeto Alumno
 				is.close();
-				// visualizo datos
-				System.out.printf("\tNombre: %s, Curso: %s - %s, Nota: %d %n", 
-						alumno.getNombre(), alumno.getCurso().getId(),
+
+				// MUESTRA LOS DATOS DEL ALUMNO RECIBIDO
+				System.out.printf("\tNombre: %s, Curso: %s - %s, Nota: %d %n",
+						alumno.getNombre(),
+						alumno.getCurso().getId(),
 						alumno.getCurso().getDescripcion(),
 						alumno.getNota());
+
 			} catch (InterruptedIOException ii) {
-				System.out.println("\t2<<FINALIZADO TIEMPO DE ESPERA - PAQUETE PERDIDO>>");				
+				// Si no se recibe respuesta dentro del tiempo límite
+				System.out.println("\t2<<FINALIZADO TIEMPO DE ESPERA - PAQUETE PERDIDO>>");
 			}
 		}
-		clientSocket.close();// cerrar socket
+
+		clientSocket.close(); // Cierra el socket UDP
 		System.out.print("Fin de cliente... ");
 	}
 }

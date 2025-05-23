@@ -1,4 +1,5 @@
-package BoletinesSolucionesProfesora.Boletin1.Ejercicio5;
+package BoletinesSolucionesProfesora.Boletin1.Ejercicio5; // Define el paquete del ejercicio
+
 /*
  * Boletín 1 SOCKETS
  * Ejercicio 5
@@ -7,32 +8,37 @@ package BoletinesSolucionesProfesora.Boletin1.Ejercicio5;
  * el mensaje recibido. Cambia el programa para que lo haga para N clientes, siendo N un
  * parámetro que tendrás que definir en el programa.
  */
-import java.io.*;
-import java.net.*;
 
-public class ejercicio5_Cliente {
-    public static void main(String[] args) throws Exception {
-        String Host = "localhost";
-        int Puerto = 6000;
-        System.out.println("Conectando con el servidor...");
+import java.io.*; // Para flujos de entrada/salida
+import java.net.*; // Para clases de red: Socket, InetAddress, etc.
+
+public class ejercicio5_Cliente { // Clase del cliente
+
+    public static void main(String[] args) throws Exception { // Método principal, lanza excepción general
+        String Host = "localhost"; // Dirección del servidor (en este caso, el mismo equipo)
+        int Puerto = 6000; // Puerto al que se conecta (debe coincidir con el que use el servidor)
+
+        System.out.println("Conectando con el servidor..."); // Mensaje informativo
 
         // ABRIR SOCKET
-        Socket Cliente = null;
+        Socket Cliente = null; // Se declara el socket
 
         try {
-            Cliente = new Socket(Host, Puerto);
-        } catch (ConnectException c) {
-            System.out.println("SERVIDOR CERRADO. ");
-            return;
+            Cliente = new Socket(Host, Puerto); // Intenta conectarse al servidor
+        } catch (ConnectException c) { // Si no puede conectar (servidor no está activo)
+            System.out.println("SERVIDOR CERRADO. "); // Mensaje de error
+            return; // Termina el programa
         }
-        // RECIBO SALUDO DEL SERVIDOR
-        InputStream aux = Cliente.getInputStream();
-        DataInputStream flujo = new DataInputStream(aux);
 
+        // RECIBO SALUDO DEL SERVIDOR
+        InputStream aux = Cliente.getInputStream(); // Obtiene el flujo de entrada del socket
+        DataInputStream flujo = new DataInputStream(aux); // Permite leer tipos de datos primitivos (como UTF)
+
+        // Lee el mensaje del servidor (ej. "Eres el cliente número 1")
         System.out.println("Recibiendo del servidor: " + flujo.readUTF());
 
-        System.out.println("CLIENTE CERRADO. ");
+        System.out.println("CLIENTE CERRADO. "); // Mensaje final
 
-        Cliente.close();// Cierra el socket
-    }// main
-}//
+        Cliente.close(); // Cierra la conexión del socket
+    }
+}
